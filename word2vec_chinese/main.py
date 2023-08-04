@@ -63,6 +63,10 @@ cn_meaning=[]
 # print(word_level_pos_column_guideword_cn)
 #遍历word_level_pos_column_word里每一个单词
 for index in range(len(word_level_pos_column_word)):
+    # 在words_bank中找不到当前单词
+    if word_level_pos_column_word[index] not in words_bank_column_word:
+        cn_meaning.append('')
+        continue
     #遍历words_bank_column_word里每一个单词
     for banks_index in range(len(words_bank_column_word)):
         #在words_bank中可以找到当前的单词
@@ -70,25 +74,22 @@ for index in range(len(word_level_pos_column_word)):
             word_meaning_list_without_network=split_str_and_remove_network_word(words_bank_column_pos[banks_index])
             #（1）word_level_pos.xlsx中当前单词的part_of_speech和guideword_cn都是空的,则将单词完整的释义保存到cn_meaning中
             if word_level_pos_column_part_of_speech[index]=='nan' and word_level_pos_column_guideword_cn[index]=='nan':
-                meaning_str=""
-                for word_meaning_str in word_meaning_list_without_network:
-                    meaning_str=meaning_str+word_meaning_str
-                cn_meaning.append(meaning_str.strip())
+                # meaning_str=""
+                # for word_meaning_str in word_meaning_list_without_network:
+                #     meaning_str=meaning_str+word_meaning_str
+                # cn_meaning.append(meaning_str.strip())
+                cn_meaning.append(words_bank_column_pos[banks_index])
             #(2)word_level_pos.xlsx中当前单词的part_of_speech不空,guideword_cn为空，则将对应地词性的释义全部写入cn_meaning中
             elif word_level_pos_column_part_of_speech[index]!='nan' and word_level_pos_column_guideword_cn[index]=='nan':
-                if word_level_pos_column_part_of_speech[index]=='verb':
+                if word_level_pos_column_part_of_speech[index].strip()=='verb':
                     for i in range(len(word_meaning_list_without_network)):
                         if 'v.' in split_str_with_dot_and_semicolon(word_meaning_list_without_network[i]):
                             cn_meaning.append(word_meaning_list_without_network[i])
                             break
-                        else:
-                            continue
-                elif word_level_pos_column_part_of_speech[index]=='adjective':
+                elif word_level_pos_column_part_of_speech[index].strip()=='adjective':
                     for i in range(len(word_meaning_list_without_network)):
                         if 'adj.' in split_str_with_dot_and_semicolon(word_meaning_list_without_network[i]):
                             cn_meaning.append(word_meaning_list_without_network[i])
-                        else:
-                            continue
                 else:
                     pass
             #(3)word_level_pos.xlsx中当前单词的part_of_speech为空,guideword_cn不空，将单词的所有意思与guideword_cn进行匹配，将相似度最高的意思存入cn_meaning中
@@ -96,12 +97,17 @@ for index in range(len(word_level_pos_column_word)):
                 to_be_selsected_meaning_list=[]
                 for i in range(len(word_meaning_list_without_network)):
                     to_be_selsected_meaning_list.extend(split_str_with_dot_and_semicolon(word_meaning_list_without_network[i])[1:])
-                    for word in to_be_selsected_meaning_list:
-                        to_be_selsected_meaning_dict={}
-                        int_word_similiarity=get_two_word_similarity(word_level_pos_column_word[index],word)
-                        to_be_selsected_meaning_dict['word']=int_word_similiarity
-                sorted_list=sorted(to_be_selsected_meaning_dict,key=lambda x: x['word'],reverse=True)
-                cn_meaning.append(sorted_list[0]['word'])
+                for word in to_be_selsected_meaning_list:
+                    # to_be_selsected_meaning_dict={}
+                    int_word_similiarity=get_two_word_similarity(word_level_pos_column_word[index],word)
+                    to_be_selsected_meaning_tuple=(word,int_word_similiarity)
+                    to_be_selsected_meaning_list.append(to_be_selsected_meaning_tuple)
+                    # to_be_selsected_meaning_dict['word']=int_word_similiarity
+                # sorted_list=sorted(to_be_selsected_meaning_dict,key=lambda x: x[word],reverse=True)
+                # cn_meaning.append(sorted_list[0].keys()[0])
+                sorted_list=sorted(to_be_selsected_meaning_list,key=lambda x: x[1],reverse=True)
+                cn_meaning.append(sorted_list[0][0])
+
             #(4)word_level_pos.xlsx中当前单词的part_of_speech和guideword_cn都不为空的,则先找出对应词性的释义，将对应词性的释义与guide_cn进行匹配，将相似度最高的意思存入cn_meaning中
             elif word_level_pos_column_part_of_speech[index]!='nan' and word_level_pos_column_guideword_cn[index]!='nan':
                 to_be_selsected_meaning_list=[]
@@ -117,18 +123,18 @@ for index in range(len(word_level_pos_column_word)):
                             to_be_selsected_meaning_list=split_str_with_dot_and_semicolon(word_meaning_list_without_network[i])[1:]
                             break
                 for word in to_be_selsected_meaning_list:
-                    to_be_selsected_meaning_dict={}
-                    int_word_similiarity=get_two_word_similarity(word_level_pos_column_word[index],word)
-                    to_be_selsected_meaning_dict['word']=int_word_similiarity
-                sorted_list=sorted(to_be_selsected_meaning_dict,key=lambda x: x['word'],reverse=True)
-                cn_meaning.append(sorted_list[0]['word'])
-
+                    # to_be_selsected_meaning_dict={}
+                    int_word_similiarity = get_two_word_similarity(word_level_pos_column_word[index], word)
+                    to_be_selsected_meaning_tuple =(word, int_word_similiarity)
+                    to_be_selsected_meaning_list.append(to_be_selsected_meaning_tuple)
+                    # to_be_selsected_meaning_dict['word']=int_word_similiarity
+                    # sorted_list=sorted(to_be_selsected_meaning_dict,key=lambda x: x[word],reverse=True)
+                    # cn_meaning.append(sorted_list[0].keys()[0])
+                sorted_list = sorted(to_be_selsected_meaning_list, key=lambda x: x[1], reverse=True)
+                cn_meaning.append(sorted_list[0][0])
             else:
                 cn_meaning.append('')
 
-        # 在words_bank中找不到当前单词
-        else:
-            cn_meaning.append('')
 # 将列表转换为Pandas的数据框
 df_word_level['cn_meaning']=cn_meaning
 #将数据框写入Excel文件
