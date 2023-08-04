@@ -1,0 +1,3 @@
+#模型训练方式一
+gensim.models.Word2Vec(sentence, window=5, min_count=10, size=128, workers=4,hs=1, negative=0, iter=5)
+
