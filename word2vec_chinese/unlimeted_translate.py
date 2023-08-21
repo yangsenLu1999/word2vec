@@ -50,16 +50,16 @@ def translate_text(text, target_language):
 
 
 if __name__ == '__main__':
-    # Obj = trans()
-    # # text = "Egypt disinfecting streets in Cairo to combat the spread of Coronavirus.\n#COVID19Africa #CoronavirusPandemic\n https://t…"
-    # text='but'
-    # res = Obj.tran(text)
-    # print(type(res))
-    # print(res)
+    Obj = trans()
+    # text = "Egypt disinfecting streets in Cairo to combat the spread of Coronavirus.\n#COVID19Africa #CoronavirusPandemic\n https://t…"
+    text='need'
+    res = Obj.tran(text)
+    print(type(res))
+    print(res)
 
-    english_text = "Hello, how are you?"
-    chinese_text = translate_text(english_text, 'zh-cn')
-
-    print(chinese_text)
+    # english_text = "Hello, how are you?"
+    # chinese_text = translate_text(english_text, 'zh-cn')
+    #
+    # print(chinese_text)
 
 
